@@ -82,7 +82,7 @@ const Sidebar = ({
     <div className="w-80 bg-card border-r border-border flex flex-col h-full">
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center justify-between w-full">
-          <h1 className="ml-2 text-lg font-semibold">
+          <h1 className="text-lg font-semibold">
             MCP Inspector v{version}
           </h1>
           {window.blocklet && (

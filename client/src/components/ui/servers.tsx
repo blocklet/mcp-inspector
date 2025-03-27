@@ -69,6 +69,7 @@ export function Servers({ setSseUrl }: ServersProps) {
 
   return (
     <div className="grid gap-4">
+      <p className="text-sm text-muted-foreground">Available MCP Servers</p>
       {servers.map((server) => (
         <Card
           key={server.did}
