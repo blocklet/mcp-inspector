@@ -19,6 +19,10 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "clean": "rm -rf dist .blocklet",
+    "bundle": "npm run clean && npm run bundle:client && npm run bundle:api",
+    "bundle:client": "vite build",
+    "bundle:api": "blocklet bundle --create-release",
     "test": "jest --config jest.config.cjs",
     "test:watch": "jest --config jest.config.cjs --watch"
   },

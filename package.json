@@ -34,8 +34,13 @@
     "publish-all": "npm publish --workspaces --access public && npm publish --access public"
   },
   "dependencies": {
+    "@arcblock/did-connect": "^2.12.48",
+    "@arcblock/ux": "^2.12.48",
+    "@blocklet/js-sdk": "^1.16.40",
     "@modelcontextprotocol/inspector-client": "^0.7.0",
     "@modelcontextprotocol/inspector-server": "^0.7.0",
+    "@mui/icons-material": "^5.17.1",
+    "@mui/material": "^5.17.1",
     "concurrently": "^9.0.1",
     "shell-quote": "^1.8.2",
     "spawn-rx": "^5.1.2",
