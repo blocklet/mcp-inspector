@@ -9,6 +9,8 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import { LocaleProvider } from "@arcblock/ux/lib/Locale/context";
+import { ThemeProvider } from "@arcblock/ux/lib/Theme";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Servers } from "@/components/ui/servers";
@@ -19,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import User from "@/components/ui/user";
 import { StdErrNotification } from "@/lib/notificationTypes";
 import {
   LoggingLevel,
@@ -26,6 +29,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 import useTheme from "../lib/useTheme";
+import { SessionProvider } from "../lib/session";
 import { version } from "../../../package.json";
 
 interface SidebarProps {
@@ -77,10 +81,19 @@ const Sidebar = ({
   return (
     <div className="w-80 bg-card border-r border-border flex flex-col h-full">
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="flex items-center">
+        <div className="flex items-center justify-between w-full">
           <h1 className="ml-2 text-lg font-semibold">
             MCP Inspector v{version}
           </h1>
+          {window.blocklet && (
+            <LocaleProvider translations={{}}>
+              <ThemeProvider>
+                <SessionProvider>
+                  <User />
+                </SessionProvider>
+              </ThemeProvider>
+            </LocaleProvider>
+          )}
         </div>
       </div>
 
@@ -127,8 +140,9 @@ const Sidebar = ({
                 />
               </div>
             </>
+          ) : window.blocklet ? (
+            <Servers setSseUrl={setSseUrl} />
           ) : (
-            window.blocklet ? <Servers setSseUrl={setSseUrl} /> :
             <>
               <div className="space-y-2">
                 <label className="text-sm font-medium">URL</label>
