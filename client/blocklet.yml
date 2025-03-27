@@ -1,0 +1,43 @@
+name: z2qZwzdTFvPFN275o7wm4WwXTAVBvdSfHSDqq
+title: MCP Inspector
+description: Client-side application for the Model Context Protocol inspector
+group: static
+main: dist
+author:
+  name: Anthropic, PBC
+  url: https://anthropic.com
+specVersion: 1.2.8
+version: 1.0.0
+files:
+  - blocklet.md
+  - screenshots
+interfaces:
+  - type: web
+    name: publicUrl
+    path: /
+    prefix: '*'
+    port: BLOCKLET_PORT
+    protocol: http
+    proxyBehavior: service
+did: z2qZwzdTFvPFN275o7wm4WwXTAVBvdSfHSDqq
+logo: logo.png
+community: ''
+documentation: ''
+homepage: ''
+license: ''
+payment:
+  price: []
+  share: []
+timeout:
+  start: 60
+requirements:
+  server: '>=1.7.0'
+  os: '*'
+  cpu: '*'
+  nodejs: '*'
+environments: []
+capabilities: {}
+screenshots:
+  - 69d611a9420eca9bd95925d5612a37ad.png
+components: []
+egress: true
