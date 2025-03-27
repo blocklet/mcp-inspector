@@ -219,15 +219,21 @@ export function useConnection({
         },
       );
 
-      const backendUrl = new URL(`${proxyServerUrl}/sse`);
-
-      backendUrl.searchParams.append("transportType", transportType);
-      if (transportType === "stdio") {
-        backendUrl.searchParams.append("command", command);
-        backendUrl.searchParams.append("args", args);
-        backendUrl.searchParams.append("env", JSON.stringify(env));
+      let backendUrl: URL;
+      if (proxyServerUrl) {
+        backendUrl = new URL(`${proxyServerUrl}/sse`);
+        backendUrl.searchParams.append("transportType", transportType);
+        if (transportType === "stdio") {
+          backendUrl.searchParams.append("command", command);
+          backendUrl.searchParams.append("args", args);
+          backendUrl.searchParams.append("env", JSON.stringify(env));
+        } else {
+          backendUrl.searchParams.append("url", sseUrl);
+        }
+      } else if (sseUrl) {
+        backendUrl = new URL(sseUrl);
       } else {
-        backendUrl.searchParams.append("url", sseUrl);
+        throw new Error("No backend URL provided");
       }
 
       // Inject auth manually instead of using SSEClientTransport, because we're

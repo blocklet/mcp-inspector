@@ -41,3 +41,5 @@ screenshots:
   - 69d611a9420eca9bd95925d5612a37ad.png
 components: []
 egress: true
+scripts:
+  dev: npm run dev

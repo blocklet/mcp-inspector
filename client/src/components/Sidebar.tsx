@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Servers } from "@/components/ui/servers";
 import {
   Select,
   SelectContent,
@@ -85,23 +86,25 @@ const Sidebar = ({
 
       <div className="p-4 flex-1 overflow-auto">
         <div className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Transport Type</label>
-            <Select
-              value={transportType}
-              onValueChange={(value: "stdio" | "sse") =>
-                setTransportType(value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select transport type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="stdio">STDIO</SelectItem>
-                <SelectItem value="sse">SSE</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {!window.blocklet && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Transport Type</label>
+              <Select
+                value={transportType}
+                onValueChange={(value: "stdio" | "sse") =>
+                  setTransportType(value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select transport type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="stdio">STDIO</SelectItem>
+                  <SelectItem value="sse">SSE</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {transportType === "stdio" ? (
             <>
@@ -125,6 +128,7 @@ const Sidebar = ({
               </div>
             </>
           ) : (
+            window.blocklet ? <Servers setSseUrl={setSseUrl} /> :
             <>
               <div className="space-y-2">
                 <label className="text-sm font-medium">URL</label>
