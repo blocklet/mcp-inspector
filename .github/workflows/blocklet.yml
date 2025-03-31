@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - master
 
 jobs:
   release:
@@ -18,8 +17,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'node'
+          node-version: '22'
 
       - name: Blocklet workflow
         uses: blocklet/action-workflow@v1
