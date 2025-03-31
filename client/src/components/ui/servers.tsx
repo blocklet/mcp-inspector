@@ -12,7 +12,7 @@ interface McpServer {
   did: string;
   name: string;
   description: string;
-  url: string;
+  endpoint: string;
   protected: boolean;
   version: string;
   logo: string;
@@ -39,7 +39,7 @@ export function Servers({ setSseUrl }: ServersProps) {
           throw new Error("Failed to fetch MCP servers");
         }
         const data = await response.json();
-        setServers(data);
+        setServers(data.servers || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load servers");
       } finally {
@@ -52,7 +52,7 @@ export function Servers({ setSseUrl }: ServersProps) {
 
   const handleServerSelect = (server: McpServer) => {
     setSelectedServer(server.did);
-    setSseUrl(server.url);
+    setSseUrl(server.endpoint);
   };
 
   if (loading) {
