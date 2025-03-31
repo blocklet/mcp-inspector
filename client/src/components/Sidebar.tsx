@@ -8,6 +8,7 @@ import {
   Github,
   Eye,
   EyeOff,
+  Settings,
 } from "lucide-react";
 import { LocaleProvider } from "@arcblock/ux/lib/Locale/context";
 import { ThemeProvider } from "@arcblock/ux/lib/Theme";
@@ -27,6 +28,7 @@ import {
   LoggingLevel,
   LoggingLevelSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { InspectorConfig } from "@/lib/configurationTypes";
 
 import useTheme from "../lib/useTheme";
 import { SessionProvider } from "../lib/session";
@@ -51,6 +53,8 @@ interface SidebarProps {
   logLevel: LoggingLevel;
   sendLogLevelRequest: (level: LoggingLevel) => void;
   loggingSupported: boolean;
+  config: InspectorConfig;
+  setConfig: (config: InspectorConfig) => void;
 }
 
 const Sidebar = ({
@@ -72,10 +76,13 @@ const Sidebar = ({
   logLevel,
   sendLogLevelRequest,
   loggingSupported,
+  config,
+  setConfig,
 }: SidebarProps) => {
   const [theme, setTheme] = useTheme();
   const [showEnvVars, setShowEnvVars] = useState(false);
   const [showBearerToken, setShowBearerToken] = useState(false);
+  const [showConfig, setShowConfig] = useState(false);
   const [shownEnvVars, setShownEnvVars] = useState<Set<string>>(new Set());
 
   return (
@@ -302,6 +309,88 @@ const Sidebar = ({
             </div>
           )}
 
+          {/* Configuration */}
+          <div className="space-y-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowConfig(!showConfig)}
+              className="flex items-center w-full"
+            >
+              {showConfig ? (
+                <ChevronDown className="w-4 h-4 mr-2" />
+              ) : (
+                <ChevronRight className="w-4 h-4 mr-2" />
+              )}
+              <Settings className="w-4 h-4 mr-2" />
+              Configuration
+            </Button>
+            {showConfig && (
+              <div className="space-y-2">
+                {Object.entries(config).map(([key, configItem]) => {
+                  const configKey = key as keyof InspectorConfig;
+                  return (
+                    <div key={key} className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {configItem.description}
+                      </label>
+                      {typeof configItem.value === "number" ? (
+                        <Input
+                          type="number"
+                          data-testid={`${configKey}-input`}
+                          value={configItem.value}
+                          onChange={(e) => {
+                            const newConfig = { ...config };
+                            newConfig[configKey] = {
+                              ...configItem,
+                              value: Number(e.target.value),
+                            };
+                            setConfig(newConfig);
+                          }}
+                          className="font-mono"
+                        />
+                      ) : typeof configItem.value === "boolean" ? (
+                        <Select
+                          data-testid={`${configKey}-select`}
+                          value={configItem.value.toString()}
+                          onValueChange={(val) => {
+                            const newConfig = { ...config };
+                            newConfig[configKey] = {
+                              ...configItem,
+                              value: val === "true",
+                            };
+                            setConfig(newConfig);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="true">True</SelectItem>
+                            <SelectItem value="false">False</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Input
+                          data-testid={`${configKey}-input`}
+                          value={configItem.value}
+                          onChange={(e) => {
+                            const newConfig = { ...config };
+                            newConfig[configKey] = {
+                              ...configItem,
+                              value: e.target.value,
+                            };
+                            setConfig(newConfig);
+                          }}
+                          className="font-mono"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           <div className="space-y-2">
             <Button className="w-full" onClick={onConnect}>
               <Play className="w-4 h-4 mr-2" />
@@ -389,36 +478,37 @@ const Sidebar = ({
           </Select>
 
           <div className="flex items-center space-x-2">
-            <a
-              href="https://modelcontextprotocol.io/docs/tools/inspector"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="ghost" title="Inspector Documentation">
-                <CircleHelp className="w-4 h-4 text-gray-800" />
-              </Button>
-            </a>
-            <a
-              href="https://modelcontextprotocol.io/docs/tools/debugging"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="ghost" title="Debugging Guide">
-                <Bug className="w-4 h-4 text-gray-800" />
-              </Button>
-            </a>
-            <a
-              href="https://github.com/modelcontextprotocol/inspector"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button
-                variant="ghost"
-                title="Report bugs or contribute on GitHub"
+            <Button variant="ghost" title="Inspector Documentation" asChild>
+              <a
+                href="https://modelcontextprotocol.io/docs/tools/inspector"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <Github className="w-4 h-4 text-gray-800" />
-              </Button>
-            </a>
+                <CircleHelp className="w-4 h-4 text-foreground" />
+              </a>
+            </Button>
+            <Button variant="ghost" title="Debugging Guide" asChild>
+              <a
+                href="https://modelcontextprotocol.io/docs/tools/debugging"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Bug className="w-4 h-4 text-foreground" />
+              </a>
+            </Button>
+            <Button
+              variant="ghost"
+              title="Report bugs or contribute on GitHub"
+              asChild
+            >
+              <a
+                href="https://github.com/modelcontextprotocol/inspector"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github className="w-4 h-4 text-foreground" />
+              </a>
+            </Button>
           </div>
         </div>
       </div>

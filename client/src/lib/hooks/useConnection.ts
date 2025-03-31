@@ -19,6 +19,10 @@ import {
   McpError,
   CompleteResultSchema,
   ErrorCode,
+  CancelledNotificationSchema,
+  ResourceListChangedNotificationSchema,
+  ToolListChangedNotificationSchema,
+  PromptListChangedNotificationSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -28,10 +32,6 @@ import { Notification, StdErrNotificationSchema } from "../notificationTypes";
 import { auth } from "@modelcontextprotocol/sdk/client/auth.js";
 import { authProvider } from "../auth";
 import packageJson from "../../../package.json";
-
-const params = new URLSearchParams(window.location.search);
-const DEFAULT_REQUEST_TIMEOUT_MSEC =
-  parseInt(params.get("timeout") ?? "") || 10000;
 
 interface UseConnectionOptions {
   transportType: "stdio" | "sse";
@@ -44,7 +44,9 @@ interface UseConnectionOptions {
   requestTimeout?: number;
   onNotification?: (notification: Notification) => void;
   onStdErrNotification?: (notification: Notification) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onPendingRequest?: (request: any, resolve: any, reject: any) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getRoots?: () => any[];
 }
 
@@ -62,7 +64,7 @@ export function useConnection({
   env,
   proxyServerUrl,
   bearerToken,
-  requestTimeout = DEFAULT_REQUEST_TIMEOUT_MSEC,
+  requestTimeout,
   onNotification,
   onStdErrNotification,
   onPendingRequest,
@@ -256,20 +258,24 @@ export function useConnection({
       });
 
       if (onNotification) {
-        client.setNotificationHandler(
+        [
+          CancelledNotificationSchema,
           ProgressNotificationSchema,
-          onNotification,
-        );
-
-        client.setNotificationHandler(
-          ResourceUpdatedNotificationSchema,
-          onNotification,
-        );
-
-        client.setNotificationHandler(
           LoggingMessageNotificationSchema,
-          onNotification,
-        );
+          ResourceUpdatedNotificationSchema,
+          ResourceListChangedNotificationSchema,
+          ToolListChangedNotificationSchema,
+          PromptListChangedNotificationSchema,
+        ].forEach((notificationSchema) => {
+          client.setNotificationHandler(notificationSchema, onNotification);
+        });
+
+        client.fallbackNotificationHandler = (
+          notification: Notification,
+        ): Promise<void> => {
+          onNotification(notification);
+          return Promise.resolve();
+        };
       }
 
       if (onStdErrNotification) {

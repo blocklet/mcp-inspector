@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [react(), createBlockletPlugin(), svgr()],
   server: {
     host: true,
-    port: +process.env.PORT || 5173,
+    port: process.env.PORT ? +process.env.PORT : 5173,
   },
   resolve: {
     alias: {
