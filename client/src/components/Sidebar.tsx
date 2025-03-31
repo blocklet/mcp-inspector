@@ -9,8 +9,11 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import { LocaleProvider } from "@arcblock/ux/lib/Locale/context";
+import { ThemeProvider } from "@arcblock/ux/lib/Theme";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Servers } from "@/components/ui/servers";
 import {
   Select,
   SelectContent,
@@ -18,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import User from "@/components/ui/user";
 import { StdErrNotification } from "@/lib/notificationTypes";
 import {
   LoggingLevel,
@@ -25,6 +29,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 import useTheme from "../lib/useTheme";
+import { SessionProvider } from "../lib/session";
 import { version } from "../../../package.json";
 
 interface SidebarProps {
@@ -76,32 +81,43 @@ const Sidebar = ({
   return (
     <div className="w-80 bg-card border-r border-border flex flex-col h-full">
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="flex items-center">
-          <h1 className="ml-2 text-lg font-semibold">
+        <div className="flex items-center justify-between w-full">
+          <h1 className="text-lg font-semibold">
             MCP Inspector v{version}
           </h1>
+          {window.blocklet && (
+            <LocaleProvider translations={{}}>
+              <ThemeProvider>
+                <SessionProvider>
+                  <User />
+                </SessionProvider>
+              </ThemeProvider>
+            </LocaleProvider>
+          )}
         </div>
       </div>
 
       <div className="p-4 flex-1 overflow-auto">
         <div className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Transport Type</label>
-            <Select
-              value={transportType}
-              onValueChange={(value: "stdio" | "sse") =>
-                setTransportType(value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select transport type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="stdio">STDIO</SelectItem>
-                <SelectItem value="sse">SSE</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {!window.blocklet && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Transport Type</label>
+              <Select
+                value={transportType}
+                onValueChange={(value: "stdio" | "sse") =>
+                  setTransportType(value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select transport type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="stdio">STDIO</SelectItem>
+                  <SelectItem value="sse">SSE</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {transportType === "stdio" ? (
             <>
@@ -124,6 +140,8 @@ const Sidebar = ({
                 />
               </div>
             </>
+          ) : window.blocklet ? (
+            <Servers setSseUrl={setSseUrl} />
           ) : (
             <>
               <div className="space-y-2">

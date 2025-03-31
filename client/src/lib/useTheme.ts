@@ -2,10 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 
 type Theme = "light" | "dark" | "system";
 
+const DEFAULT_THEME = window.blocklet ? "light" : "system";
+
 const useTheme = (): [Theme, (mode: Theme) => void] => {
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem("theme") as Theme;
-    return savedTheme || "system";
+    return savedTheme || DEFAULT_THEME;
   });
 
   useEffect(() => {

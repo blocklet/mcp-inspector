@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import {
   ClientRequest,
   CompatibilityCallToolResult,
@@ -47,8 +48,11 @@ import Sidebar from "./components/Sidebar";
 import ToolsTab from "./components/ToolsTab";
 
 const params = new URLSearchParams(window.location.search);
+const isBlocklet = !!window.blocklet;
+
 const PROXY_PORT = params.get("proxyPort") ?? "3000";
-const PROXY_SERVER_URL = `http://${window.location.hostname}:${PROXY_PORT}`;
+const PROXY_SERVER_URL = isBlocklet ? "" : `http://${window.location.hostname}:${PROXY_PORT}`; // prettier-ignore
+const DEFAULT_TRANSPORT_TYPE = isBlocklet ? "sse" : "stdio";
 
 const App = () => {
   // Handle OAuth callback route
@@ -85,11 +89,15 @@ const App = () => {
   });
 
   const [sseUrl, setSseUrl] = useState<string>(() => {
-    return localStorage.getItem("lastSseUrl") || "http://localhost:3001/sse";
+    return (
+      localStorage.getItem("lastSseUrl") ||
+      window.location.origin + "/.well-known/service/mcp/sse"
+    );
   });
   const [transportType, setTransportType] = useState<"stdio" | "sse">(() => {
     return (
-      (localStorage.getItem("lastTransportType") as "stdio" | "sse") || "stdio"
+      (localStorage.getItem("lastTransportType") as "stdio" | "sse") ||
+      DEFAULT_TRANSPORT_TYPE
     );
   });
   const [logLevel, setLogLevel] = useState<LoggingLevel>("debug");
