@@ -28,7 +28,7 @@ jobs:
         with:
           deps-server-version: beta
           skip-upload: false
-          skip-deploy: false
+          skip-deploy: true
           skip-release: true
           bundle-command: npm run bundle
           working-directory: ./client
