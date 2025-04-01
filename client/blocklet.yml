@@ -7,7 +7,7 @@ author:
   name: Anthropic, PBC
   url: https://anthropic.com
 specVersion: 1.2.8
-version: 1.1.0
+version: 1.1.1
 files:
   - blocklet.md
   - screenshots
@@ -38,7 +38,7 @@ requirements:
 environments: []
 capabilities: {}
 screenshots:
-  - 69d611a9420eca9bd95925d5612a37ad.png
+  - 39aeb741fb36038b14d78b737c9f919a.png
 components: []
 egress: true
 scripts:
