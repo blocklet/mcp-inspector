@@ -1,6 +1,6 @@
 {
   "name": "@modelcontextprotocol/inspector-client",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Client-side application for the Model Context Protocol inspector",
   "license": "MIT",
   "author": "Anthropic, PBC (https://anthropic.com)",
@@ -18,11 +18,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
     "clean": "rm -rf dist .blocklet",
     "bundle": "npm run clean && npm run bundle:client && npm run bundle:api",
     "bundle:client": "vite build",
     "bundle:api": "blocklet bundle --create-release",
+    "preview": "vite preview --port 6274",
     "test": "jest --config jest.config.cjs",
     "test:watch": "jest --config jest.config.cjs --watch"
   },

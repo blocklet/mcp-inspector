@@ -52,7 +52,7 @@ import { InspectorConfig } from "./lib/configurationTypes";
 const params = new URLSearchParams(window.location.search);
 const isBlocklet = !!window.blocklet;
 
-const PROXY_PORT = params.get("proxyPort") ?? "3000";
+const PROXY_PORT = params.get("proxyPort") ?? "6277";
 const PROXY_SERVER_URL = isBlocklet ? "" : `http://${window.location.hostname}:${PROXY_PORT}`; // prettier-ignore
 const CONFIG_LOCAL_STORAGE_KEY = "inspectorConfig_v1";
 const DEFAULT_TRANSPORT_TYPE = isBlocklet ? "sse" : "stdio";
@@ -153,6 +153,7 @@ const App = () => {
     handleCompletion,
     completionsSupported,
     connect: connectMcpServer,
+    disconnect: disconnectMcpServer,
   } = useConnection({
     transportType,
     command,
@@ -466,6 +467,7 @@ const App = () => {
         bearerToken={bearerToken}
         setBearerToken={setBearerToken}
         onConnect={connectMcpServer}
+        onDisconnect={disconnectMcpServer}
         stdErrNotifications={stdErrNotifications}
         logLevel={logLevel}
         sendLogLevelRequest={sendLogLevelRequest}

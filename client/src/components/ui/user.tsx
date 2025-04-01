@@ -10,6 +10,6 @@ export default function User() {
   const { locale } = useLocaleContext();
   const [theme] = useTheme();
   return (
-    <SessionManager session={session} locale={locale} dark={theme === "dark"} size={20} />
+    <SessionManager session={session} locale={locale} dark={theme === "dark"} size={24} />
   );
 }
