@@ -12,7 +12,7 @@ class InspectorOAuthClientProvider implements OAuthClientProvider {
     return (
       window.location.origin +
       (window.blocklet?.prefix || "/") +
-      "/oauth/callback"
+      "oauth/callback"
     );
   }
 
