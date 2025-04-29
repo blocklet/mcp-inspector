@@ -44,8 +44,8 @@ import {
 
 interface SidebarProps {
   connectionStatus: ConnectionStatus;
-  transportType: "stdio" | "sse";
-  setTransportType: (type: "stdio" | "sse") => void;
+  transportType: "stdio" | "sse" | "streamable-http";
+  setTransportType: (type: "stdio" | "sse" | "streamable-http") => void;
   command: string;
   setCommand: (command: string) => void;
   args: string;
@@ -56,9 +56,12 @@ interface SidebarProps {
   setEnv: (env: Record<string, string>) => void;
   bearerToken: string;
   setBearerToken: (token: string) => void;
+  headerName?: string;
+  setHeaderName?: (name: string) => void;
   onConnect: () => void;
   onDisconnect: () => void;
   stdErrNotifications: StdErrNotification[];
+  clearStdErrNotifications: () => void;
   logLevel: LoggingLevel;
   sendLogLevelRequest: (level: LoggingLevel) => void;
   loggingSupported: boolean;
@@ -80,9 +83,12 @@ const Sidebar = ({
   setEnv,
   bearerToken,
   setBearerToken,
+  headerName,
+  setHeaderName,
   onConnect,
   onDisconnect,
   stdErrNotifications,
+  clearStdErrNotifications,
   logLevel,
   sendLogLevelRequest,
   loggingSupported,
@@ -97,47 +103,43 @@ const Sidebar = ({
 
   return (
     <div className="w-80 bg-card border-r border-border flex flex-col h-full">
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between w-full">
-          <h1 className="text-lg font-semibold">MCP Inspector v{version}</h1>
-          {window.blocklet && (
-            <LocaleProvider translations={{}}>
-              <ThemeProvider>
-                <SessionProvider>
-                  <User />
-                </SessionProvider>
-              </ThemeProvider>
-            </LocaleProvider>
-          )}
-        </div>
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+        <h1 className="text-lg font-semibold">MCP Inspector v{version}</h1>
+        {window.blocklet && (
+          <LocaleProvider translations={{}}>
+            <ThemeProvider>
+              <SessionProvider>
+                <User />
+              </SessionProvider>
+            </ThemeProvider>
+          </LocaleProvider>
+        )}
       </div>
-
       <div className="p-4 flex-1 overflow-auto">
         <div className="space-y-4">
-          {!window.blocklet && (
-            <div className="space-y-2">
-              <label
-                className="text-sm font-medium"
-                htmlFor="transport-type-select"
-              >
-                Transport Type
-              </label>
-              <Select
-                value={transportType}
-                onValueChange={(value: "stdio" | "sse") =>
-                  setTransportType(value)
-                }
-              >
-                <SelectTrigger id="transport-type-select">
-                  <SelectValue placeholder="Select transport type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="stdio">STDIO</SelectItem>
-                  <SelectItem value="sse">SSE</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          <div className="space-y-2">
+            <label
+              className="text-sm font-medium"
+              htmlFor="transport-type-select"
+            >
+              Transport Type
+            </label>
+            <Select
+              value={transportType}
+              onValueChange={(value: "stdio" | "sse" | "streamable-http") =>
+                setTransportType(value)
+              }
+            >
+              <SelectTrigger id="transport-type-select">
+                <SelectValue placeholder="Select transport type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="stdio">STDIO</SelectItem>
+                <SelectItem value="sse">SSE</SelectItem>
+                <SelectItem value="streamable-http">Streamable HTTP</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
           {transportType === "stdio" ? (
             <>
@@ -190,6 +192,7 @@ const Sidebar = ({
                   variant="outline"
                   onClick={() => setShowBearerToken(!showBearerToken)}
                   className="flex items-center w-full"
+                  data-testid="auth-button"
                   aria-expanded={showBearerToken}
                 >
                   {showBearerToken ? (
@@ -201,6 +204,16 @@ const Sidebar = ({
                 </Button>
                 {showBearerToken && (
                   <div className="space-y-2">
+                    <label className="text-sm font-medium">Header Name</label>
+                    <Input
+                      placeholder="Authorization"
+                      onChange={(e) =>
+                        setHeaderName && setHeaderName(e.target.value)
+                      }
+                      data-testid="header-input"
+                      className="font-mono"
+                      value={headerName}
+                    />
                     <label
                       className="text-sm font-medium"
                       htmlFor="bearer-token-input"
@@ -212,6 +225,7 @@ const Sidebar = ({
                       placeholder="Bearer Token"
                       value={bearerToken}
                       onChange={(e) => setBearerToken(e.target.value)}
+                      data-testid="bearer-token-input"
                       className="font-mono"
                       type="password"
                     />
@@ -520,7 +534,9 @@ const Sidebar = ({
                   </SelectTrigger>
                   <SelectContent>
                     {Object.values(LoggingLevelSchema.enum).map((level) => (
-                      <SelectItem value={level}>{level}</SelectItem>
+                      <SelectItem key={level} value={level}>
+                        {level}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -530,9 +546,19 @@ const Sidebar = ({
             {stdErrNotifications.length > 0 && (
               <>
                 <div className="mt-4 border-t border-gray-200 pt-4">
-                  <h3 className="text-sm font-medium">
-                    Error output from MCP server
-                  </h3>
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-sm font-medium">
+                      Error output from MCP server
+                    </h3>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={clearStdErrNotifications}
+                      className="h-8 px-2"
+                    >
+                      Clear
+                    </Button>
+                  </div>
                   <div className="mt-2 max-h-80 overflow-y-auto">
                     {stdErrNotifications.map((notification, index) => (
                       <div
