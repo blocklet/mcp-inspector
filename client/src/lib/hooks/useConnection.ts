@@ -31,7 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { ConnectionStatus } from "../constants";
 import { Notification, StdErrNotificationSchema } from "../notificationTypes";
-import { auth, UnauthorizedError } from "@modelcontextprotocol/sdk/client/auth.js";
+import { auth } from "@modelcontextprotocol/sdk/client/auth.js";
 import { InspectorOAuthClientProvider } from "../auth";
 import packageJson from "../../../package.json";
 import {
@@ -246,7 +246,7 @@ export function useConnection({
   };
 
   const handleAuthError = async (error: unknown) => {
-    if (error instanceof SseError && error.code === 401) {
+    if ((error instanceof SseError && error.code === 401) || (error as unknown as { message: string })?.message?.includes("Unauthorized")) {
       // Create a new auth provider with the current server URL
       const serverAuthProvider = new InspectorOAuthClientProvider(sseUrl);
 
